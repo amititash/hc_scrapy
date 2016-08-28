@@ -1,4 +1,4 @@
-
+#single page crawl
 import scrapy
 import logging
 from scrapy.contrib.spiders import Rule
@@ -22,23 +22,24 @@ class ScrapySampleItem(Item):
     
 class StackOverflowSpider(scrapy.Spider): 
 
-        name = 'furnstyl' 
-        start_urls = ["http://www.furnstyl.com/decor"] 
-     #'http://www.furnstyl.com/furniture','http://www.furnstyl.com/decor',"http://www.furnstyl.com/wall-covering","http://www.furnstyl.com/flooring",
+        name = 'lekian others' 
+        start_urls = ["http://www.lekiaan.com/categories/storage/cid-CU00204280.aspx", "http://www.lekiaan.com/categories/display/cid-CU00204288.aspx","http://www.lekiaan.com/categories/mirrors/cid-CU00204296.aspx","http://www.lekiaan.com/categories/accessories/cid-CU00204298.aspx","http://www.lekiaan.com/categories/television-units/cid-CU00262438.aspx","http://www.lekiaan.com/categories/chairs/cid-CU00273640.aspx"] 
+     
 		
         def parse(self, response): 
-            for href in response.css('.product-image::attr(href)'): 
+            for href in response.css('.bucket_left a::attr(href)'): 
               full_url = response.urljoin(href.extract()) 
-              yield scrapy.Request(full_url, callback=self.parse_product) 
+              logging.info(full_url)
+              yield scrapy.Request(full_url, callback=self.parse_product,dont_filter = True) 
 
         def parse_product(self, response):
            items = []
            item = ScrapySampleItem()
     
            item['title'] =  response.css('h1::text').extract_first()
-           item['image'] =  response.css('.cloud-zoom img::attr(src)').extract_first()
-           item['desc']  = response.css('div[id="product_tabs_description_contents"] .std').extract()
-           item['price'] = response.css('.price').extract_first()
+           item['image'] =  response.css('.product-largimg::attr(src)').extract_first()
+           item['desc']  = response.css('.product_desc p::text').extract()
+           item['price'] = response.css('.sp_amt::text').extract_first()
            
            if not item['desc']:
                logging.info("EMPTY RECIEVED")

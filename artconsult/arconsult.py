@@ -1,4 +1,4 @@
-
+#single page crawl
 import scrapy
 import logging
 from scrapy.contrib.spiders import Rule
@@ -20,25 +20,26 @@ class ScrapySampleItem(Item):
     image = Field()
     
     
-class StackOverflowSpider(scrapy.Spider): 
+class artconsultSpider(scrapy.Spider): 
 
-        name = 'furnstyl' 
-        start_urls = ["http://www.furnstyl.com/decor"] 
-     #'http://www.furnstyl.com/furniture','http://www.furnstyl.com/decor',"http://www.furnstyl.com/wall-covering","http://www.furnstyl.com/flooring",
+        name = 'artconsult' 
+        start_urls = ["http://artkonsult.com/new/"] 
+     
 		
         def parse(self, response): 
-            for href in response.css('.product-image::attr(href)'): 
+            for href in response.css('.shop-loop-title a::attr(href)'): 
               full_url = response.urljoin(href.extract()) 
-              yield scrapy.Request(full_url, callback=self.parse_product) 
+              logging.info(full_url)
+              yield scrapy.Request(full_url, callback=self.parse_product,dont_filter = True) 
 
         def parse_product(self, response):
            items = []
            item = ScrapySampleItem()
     
            item['title'] =  response.css('h1::text').extract_first()
-           item['image'] =  response.css('.cloud-zoom img::attr(src)').extract_first()
-           item['desc']  = response.css('div[id="product_tabs_description_contents"] .std').extract()
-           item['price'] = response.css('.price').extract_first()
+           item['image'] =  response.css('.attachment-shop_single::attr(src)').extract_first()
+           item['desc']  = response.css('.posted_in a::text').extract()
+           item['price'] = response.css('.woocommerce-Price-amount::text').extract()
            
            if not item['desc']:
                logging.info("EMPTY RECIEVED")
