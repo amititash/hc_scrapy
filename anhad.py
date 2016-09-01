@@ -1,4 +1,4 @@
-
+#single page crawl
 import scrapy
 import logging
 from scrapy.contrib.spiders import Rule
@@ -22,23 +22,24 @@ class ScrapySampleItem(Item):
     
 class StackOverflowSpider(scrapy.Spider): 
 
-        name = 'furnstyl' 
-        start_urls = ["http://www.furnstyl.com/decor"] 
-     #'http://www.furnstyl.com/furniture','http://www.furnstyl.com/decor',"http://www.furnstyl.com/wall-covering","http://www.furnstyl.com/flooring",
+        name = 'anhad' 
+        start_urls = ["https://www.theanhadshop.com/collections/home-textile","https://www.theanhadshop.com/collections/home-textile?page=2","https://www.theanhadshop.com/collections/home-textile?page=3","https://www.theanhadshop.com/collections/tableware"] 
+     
 		
         def parse(self, response): 
-            for href in response.css('.product-image::attr(href)'): 
+            for href in response.css('.ci a::attr(href)'): 
               full_url = response.urljoin(href.extract()) 
-              yield scrapy.Request(full_url, callback=self.parse_product) 
+              logging.info(full_url)
+              yield scrapy.Request(full_url, callback=self.parse_product,dont_filter = True) 
 
         def parse_product(self, response):
            items = []
            item = ScrapySampleItem()
     
            item['title'] =  response.css('h1::text').extract_first()
-           item['image'] =  response.css('.cloud-zoom img::attr(src)').extract_first()
-           item['desc']  = response.css('div[id="product_tabs_description_contents"] .std').extract()
-           item['price'] = response.css('.price').extract_first()
+           item['image'] =  response.css('.thumbnail::attr(src)').extract_first()
+           item['desc']  = response.css('.rte span::text').extract()
+           item['price'] = response.css('p[id="product-price"] .product-price .money::text').extract_first()
            
            if not item['desc']:
                logging.info("EMPTY RECIEVED")

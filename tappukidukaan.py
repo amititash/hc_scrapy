@@ -22,12 +22,12 @@ class ScrapySampleItem(Item):
     
 class StackOverflowSpider(scrapy.Spider): 
 
-        name = 'green essence' 
-        start_urls = ["http://www.greenessencestore.com/Planters-depid-423-page-1.html"] 
+        name = 'tappukidukan' 
+        start_urls = ["http://www.tappukidukaan.com/index.php/home-decor.html?limit=all"] 
      
 		
         def parse(self, response): 
-            for href in response.css('.catprodimg a::attr(href)'): 
+            for href in response.css('.product-image::attr(href)'): 
               full_url = response.urljoin(href.extract()) 
               logging.info(full_url)
               yield scrapy.Request(full_url, callback=self.parse_product,dont_filter = True) 
@@ -36,14 +36,14 @@ class StackOverflowSpider(scrapy.Spider):
            items = []
            item = ScrapySampleItem()
     
-           item['title'] =  map(unicode.strip, response.css('.title::text').extract())
-           item['image'] =  response.css('img[id="largeImage"]::attr(src)').extract_first()
-           item['desc']  = response.css('.desc_shorttext').extract()
-           item['price'] = response.css('.amt::text').extract_first()
+           item['title'] =  response.css('.product-name h2::text').extract_first()
+           item['image'] =  response.css('.cloud-zoom img::attr(src)').extract_first()
+           item['desc']  = response.css('.short-description').extract()
+           item['price'] = response.css('.regular-price .price::text').extract_first()
            
            if not item['desc']:
                logging.info("EMPTY RECIEVED")
-               item['desc']  = response.css('.title::text').extract()
+               item['desc']  = response.css('h2::text').extract_first()
            item['link']  = response.url
            items.append(item)
     		
