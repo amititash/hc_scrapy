@@ -1,1 +1,2 @@
-*.json
+hc_scrapy/*.pyc
+hc_scrapy/spiders/*.pyc
